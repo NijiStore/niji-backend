@@ -1,0 +1,3 @@
+3WuMSFV-TGkb.S%
+
+postgresql://postgres:3WuMSFV-TGkb.S%@db.nlmowgprdvmpidyqgeoi.supabase.co:5432/postgres
