@@ -14,7 +14,7 @@ const pool = new Pool({
 
 // ── MIDDLEWARE ──
 app.use(cors({
-  origin: 'https://nijistore.github.io', // GitHub Pages frontend
+  origin: ['https://nijistore.github.io'],
 }));
 app.use(express.json());
 
