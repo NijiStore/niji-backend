@@ -44,12 +44,12 @@ app.post('/api/prototypes', async (req, res) => {
   try {
     const result = await pool.query(
       `INSERT INTO prototypes
-         (id, name, category, date, iteration, time, difficulty, cost,
+         (id, name, category, date, model, time, difficulty, cost,
           verdict, price, verdict_note, materials, worked, didnt, created_at)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
        RETURNING *`,
       [
-        p.id, p.name, p.category, p.date, p.iteration,
+        p.id, p.name, p.category, p.date, p.model,
         p.time, p.difficulty, p.cost, p.verdict, p.price,
         p.verdictNote,
         JSON.stringify(p.materials || []),
@@ -71,13 +71,13 @@ app.patch('/api/prototypes/:id', async (req, res) => {
   try {
     const result = await pool.query(
       `UPDATE prototypes SET
-         name=$1, category=$2, date=$3, iteration=$4, time=$5,
+         name=$1, category=$2, date=$3, model=$4, time=$5,
          difficulty=$6, cost=$7, verdict=$8, price=$9,
          verdict_note=$10, materials=$11, worked=$12, didnt=$13
        WHERE id=$14
        RETURNING *`,
       [
-        p.name, p.category, p.date, p.iteration, p.time,
+        p.name, p.category, p.date, p.model, p.time,
         p.difficulty, p.cost, p.verdict, p.price, p.verdictNote,
         JSON.stringify(p.materials || []),
         JSON.stringify(p.worked   || []),
@@ -115,7 +115,7 @@ function formatRow(row) {
     name:        row.name,
     category:    row.category,
     date:        row.date,
-    iteration:   row.iteration,
+    model:       row.model,
     time:        row.time,
     difficulty:  row.difficulty,
     cost:        row.cost,
