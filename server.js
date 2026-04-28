@@ -27,8 +27,6 @@ const protojournalRoutes = require('./routes/protojournal');
 const authRoutes = require('./routes/auth');
 
 // mount routes
-app.use('/api/protojournal', protojournalRoutes);
-app.use('/auth', authRoutes);
 
 app.get('/auth/bootstrap', async (req, res) => {
   try {
@@ -76,6 +74,9 @@ app.get('/test-db', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+app.use('/api/protojournal', protojournalRoutes);
+app.use('/auth', authRoutes);
 
 // ── START ──
 app.listen(PORT, () => {
