@@ -2,7 +2,6 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
-const pool = require('./db');
 
 // ── APP ──
 const app  = express();
@@ -15,6 +14,8 @@ app.use(cors({
 }));
 app.use(cookieParser());
 app.use(express.json());
+
+const pool = require('./db');
 
 // ── HEALTH CHECK ──
 app.get('/', (req, res) => {
@@ -29,7 +30,7 @@ const authRoutes = require('./routes/auth');
 app.use('/api/protojournal', protojournalRoutes);
 app.use('/auth', authRoutes);
 
-app.post('/auth/bootstrap', async (req, res) => {
+app.get('/auth/bootstrap', async (req, res) => {
   try {
     console.log('BOOTSTRAP HIT');
 
