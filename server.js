@@ -31,36 +31,38 @@ app.use('/auth', authRoutes);
 
 app.post('/auth/bootstrap', async (req, res) => {
   try {
-    console.log('1. START');
+    console.log('BOOTSTRAP HIT');
 
-    const { key, username, password } = req.body;
-    console.log('2. BODY OK');
+    const { key, username, password } = req.body || {};
+
+    if (!key || !username || !password) {
+      return res.status(400).json({ error: 'Missing fields' });
+    }
 
     if (key !== process.env.BOOTSTRAP_KEY) {
-      console.log('3. BAD KEY');
       return res.status(403).json({ error: 'Invalid bootstrap key' });
     }
 
-    console.log('4. KEY OK');
-
     const bcrypt = require('bcrypt');
-    const hash = await bcrypt.hash(password, 10);
-    console.log('5. HASH OK');
 
-    console.log('6. BEFORE DB');
+    const hash = await bcrypt.hash(password, 10);
 
     const result = await pool.query(
       'INSERT INTO users (username, password_hash) VALUES ($1, $2) RETURNING id, username',
       [username, hash]
     );
 
-    console.log('7. AFTER DB');
-
-    res.json({ success: true, user: result.rows[0] });
+    return res.json({
+      success: true,
+      user: result.rows[0]
+    });
 
   } catch (err) {
-    console.error('ERROR:', err);
-    res.status(500).json({ error: 'Server error', details: err.message });
+    console.error('BOOTSTRAP ERROR:', err);
+    return res.status(500).json({
+      error: 'Bootstrap failed',
+      details: err.message
+    });
   }
 });
 
