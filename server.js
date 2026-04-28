@@ -63,6 +63,16 @@ app.post('/auth/bootstrap', async (req, res) => {
   }
 });
 
+app.get('/test-db', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT NOW()');
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error('DB TEST ERROR:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ── START ──
 app.listen(PORT, () => {
   console.log(`Niji server running on port ${PORT}`);
