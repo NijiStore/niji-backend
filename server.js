@@ -29,20 +29,30 @@ app.use('/api/protojournal', protojournalRoutes);
 app.use('/auth', authRoutes);
 
 app.post('/auth/bootstrap', async (req, res) => {
+  console.log('BOOTSTRAP START');
+
   const { key, username, password } = req.body;
 
+  console.log('BODY PARSED');
+
   if (key !== process.env.BOOTSTRAP_KEY) {
+    console.log('INVALID KEY');
     return res.status(403).json({ error: 'Invalid bootstrap key' });
   }
 
-  const bcrypt = require('bcrypt');
+  console.log('KEY OK');
 
+  const bcrypt = require('bcrypt');
   const hash = await bcrypt.hash(password, 10);
+
+  console.log('HASH DONE');
 
   const result = await pool.query(
     'INSERT INTO users (username, password_hash) VALUES ($1, $2) RETURNING id, username',
     [username, hash]
   );
+
+  console.log('DB INSERT DONE');
 
   res.json({
     success: true,
