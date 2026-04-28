@@ -29,35 +29,38 @@ app.use('/api/protojournal', protojournalRoutes);
 app.use('/auth', authRoutes);
 
 app.post('/auth/bootstrap', async (req, res) => {
-  console.log('BOOTSTRAP START');
+  try {
+    console.log('1. START');
 
-  const { key, username, password } = req.body;
+    const { key, username, password } = req.body;
+    console.log('2. BODY OK');
 
-  console.log('BODY PARSED');
+    if (key !== process.env.BOOTSTRAP_KEY) {
+      console.log('3. BAD KEY');
+      return res.status(403).json({ error: 'Invalid bootstrap key' });
+    }
 
-  if (key !== process.env.BOOTSTRAP_KEY) {
-    console.log('INVALID KEY');
-    return res.status(403).json({ error: 'Invalid bootstrap key' });
+    console.log('4. KEY OK');
+
+    const bcrypt = require('bcrypt');
+    const hash = await bcrypt.hash(password, 10);
+    console.log('5. HASH OK');
+
+    console.log('6. BEFORE DB');
+
+    const result = await pool.query(
+      'INSERT INTO users (username, password_hash) VALUES ($1, $2) RETURNING id, username',
+      [username, hash]
+    );
+
+    console.log('7. AFTER DB');
+
+    res.json({ success: true, user: result.rows[0] });
+
+  } catch (err) {
+    console.error('ERROR:', err);
+    res.status(500).json({ error: 'Server error', details: err.message });
   }
-
-  console.log('KEY OK');
-
-  const bcrypt = require('bcrypt');
-  const hash = await bcrypt.hash(password, 10);
-
-  console.log('HASH DONE');
-
-  const result = await pool.query(
-    'INSERT INTO users (username, password_hash) VALUES ($1, $2) RETURNING id, username',
-    [username, hash]
-  );
-
-  console.log('DB INSERT DONE');
-
-  res.json({
-    success: true,
-    user: result.rows[0]
-  });
 });
 
 // ── START ──
