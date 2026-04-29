@@ -1,5 +1,5 @@
 const pool = require('../db');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const { createSession, deleteSession } = require('./sessionStore');
 
 async function login(req, res) {

@@ -2,7 +2,10 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../db');
 const bcrypt = require('bcryptjs');
+const { createSession } = require('../auth/sessionStore');
+const auth = require('../auth/authMiddleware');
 
+// 🔐 LOGIN
 router.post('/login', async (req, res) => {
   const { username, password } = req.body;
 
@@ -17,13 +20,21 @@ router.post('/login', async (req, res) => {
   const valid = await bcrypt.compare(password, user.password_hash);
   if (!valid) return res.status(401).json({ error: 'Invalid credentials' });
 
-  res.cookie('uid', user.id, {
+  // ✅ FIXED: createSession returns ID directly
+  const sessionId = await createSession(user.id);
+
+  res.cookie('sessionId', sessionId, {
     httpOnly: true,
     sameSite: 'None',
     secure: true
   });
 
   res.json({ success: true });
+});
+
+// 👤 GET CURRENT USER
+router.get('/me', auth, (req, res) => {
+  res.json(req.user);
 });
 
 module.exports = router;
