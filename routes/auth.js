@@ -32,6 +32,18 @@ router.post('/login', async (req, res) => {
   res.json({ success: true });
 });
 
+router.post('/logout', async (req, res) => {
+  const sessionId = req.cookies.sessionId;
+
+  if (sessionId) {
+    const { deleteSession } = require('../auth/sessionStore');
+    await deleteSession(sessionId);
+  }
+
+  res.clearCookie('sessionId');
+  res.json({ success: true });
+});
+
 // 👤 GET CURRENT USER
 router.get('/me', auth, (req, res) => {
   res.json(req.user);

@@ -29,41 +29,6 @@ const authRoutes = require('./routes/auth');
 
 // mount routes
 
-app.post('/auth/bootstrap', async (req, res) => {
-  try {
-    console.log('BOOTSTRAP HIT');
-
-    const { key, username, password } = req.body || {};
-
-    if (!key || !username || !password) {
-      return res.status(400).json({ error: 'Missing fields' });
-    }
-
-    if (key !== process.env.BOOTSTRAP_KEY) {
-      return res.status(403).json({ error: 'Invalid bootstrap key' });
-    }
-
-    const hash = await bcrypt.hash(password, 10);
-
-    const result = await pool.query(
-      'INSERT INTO users (username, password_hash) VALUES ($1, $2) RETURNING id, username',
-      [username, hash]
-    );
-
-    return res.json({
-      success: true,
-      user: result.rows[0]
-    });
-
-  } catch (err) {
-    console.error('BOOTSTRAP ERROR:', err);
-    return res.status(500).json({
-      error: 'Bootstrap failed',
-      details: err.message
-    });
-  }
-});
-
 app.get('/test-db', async (req, res) => {
   try {
     const result = await pool.query('SELECT NOW()');
