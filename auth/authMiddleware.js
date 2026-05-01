@@ -18,10 +18,12 @@ async function auth(req, res, next) {
     return res.status(401).json({ error: 'Session expired' });
   }
 
-  const userRes = await pool.query(
-    'SELECT id, username FROM users WHERE id = $1',
-    [session.user_id]
-  );
+  const userRes = await pool.query(`
+    SELECT u.id, u.username, r.name AS role, r.permissions
+    FROM users u
+    LEFT JOIN roles r ON u.role_id = r.id
+    WHERE u.id = $1
+  `, [session.user_id]);
 
   req.user = userRes.rows[0];
 
