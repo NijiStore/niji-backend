@@ -10,14 +10,12 @@ router.use(auth, requirePermission('admin:access'));
 
 // GET all users
 router.get('/users', async (req, res) => {
-  const userRes = await pool.query(`
-    SELECT u.id, u.username, u.role_id, r.permissions
+  const result = await pool.query(`
+    SELECT u.id, u.username, u.role_id, r.name AS role
     FROM users u
     LEFT JOIN roles r ON u.role_id = r.id
-    WHERE u.id = $1
-  `, [session.user_id]);
-
-  req.user = userRes.rows[0];
+  `);
+  res.json(result.rows);
 });
 
 // CREATE user
